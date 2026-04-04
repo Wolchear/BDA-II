@@ -5,6 +5,7 @@ data:
   dirs:
     raw: "raw"
     references: "references"
+    trimmed: 'trimmed'
 
 workflow:
   base_root: "workflow"
@@ -13,6 +14,13 @@ workflow:
     scripts: "scripts"
     lib: "lib"
     envs: 'envs'
+
+qc:
+  base_root: "QC"
+  dirs:
+    mapping: 'mapping'
+    raw: 'raw'
+    trimmed: 'trimmed'
 
 suffix:
   fasta: 'fasta'
