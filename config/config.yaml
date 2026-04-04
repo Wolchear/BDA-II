@@ -1,0 +1,27 @@
+max_threads: 6
+
+data:
+  base_root: "data"
+  dirs:
+    raw: "raw"
+    references: "references"
+
+workflow:
+  base_root: "workflow"
+  dirs:
+    rules: "rules"
+    scripts: "scripts"
+    lib: "lib"
+    envs: 'envs'
+
+suffix:
+  fasta: 'fasta'
+  fastq: 'fastq'
+  compressed: 'gz'
+
+
+
+ref:
+  genome: 
+    link: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.primary_assembly.genome.fa.gz"
+    file_name: "homo_GRCh38_ref.fa"

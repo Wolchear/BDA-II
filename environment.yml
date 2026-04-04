@@ -1,0 +1,11 @@
+name: BDA-II
+
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.12
+  - snakemake>=9.13.7
+  - pandas>=3.0.1
