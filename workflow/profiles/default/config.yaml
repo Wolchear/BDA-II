@@ -1,0 +1,3 @@
+use-conda: true
+cores: 6
+rerun-incomplete: true
