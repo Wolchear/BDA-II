@@ -19,7 +19,7 @@ rule build_index:
             ".bwt.2bit.64",
             ".pac",
         )
-    threads: max(1, config['max_threads'])
+    threads: 1
     log:
         "logs/bwameth/index.log"
     conda:
@@ -40,7 +40,7 @@ rule map_data:
             bam=".bam",
             bai=".bai"
         )
-    threads: 1
+    threads: max(1, config['max_threads'] // 2)
     conda:
         "../envs/map_data.yml"
     log:
