@@ -13,13 +13,12 @@ rule build_index:
     output:
         multiext(f"{REF_DIR}/genome.fa.bwameth.c2t",
             "",
+            ".0123",
             ".amb",
             ".ann",
-            ".bwt",
+            ".bwt.2bit.64",
             ".pac",
-            ".sa"
-        ),
-        f"{REF_DIR}/genome.fa.fai"
+        )
     threads: max(1, config['max_threads'])
     log:
         "logs/bwameth/index.log"
