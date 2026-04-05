@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - bwameth=0.2.9
+  - samtools=1.23.1

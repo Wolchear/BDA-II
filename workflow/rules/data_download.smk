@@ -41,7 +41,25 @@ rule get_genome:
     threads: 1
     log:
         f"logs/ref/{REF_GEN_CONF['file_name']}.log"
+    conda:
+        f"../envs/data_download.yml"
     shell:
         """
         wget -c -O {output.genome} {params.link} > {log} 2>&1
+        """
+
+rule gunzip:
+    input:
+        "{input_dir}/{file}." + GZIPPED_SUFFIX
+    output:
+        "{input_dir}/{file}"
+    threads: max(1, config['max_threads'])
+    wildcard_constraints:
+        input_dir=f"{REF_DIR}|{RAW_DIR}",
+        file=r".+(?<!\.gz)"
+    conda:
+        f"../envs/data_download.yml"
+    shell:
+        """
+        pigz -dc -p {threads} {input} > {output}
         """

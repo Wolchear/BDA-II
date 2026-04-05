@@ -15,6 +15,11 @@ workflow:
     lib: "lib"
     envs: 'envs'
 
+output:
+  base_root: "output"
+  dirs:
+    mapped: 'mapped'
+
 qc:
   base_root: "QC"
   dirs:
