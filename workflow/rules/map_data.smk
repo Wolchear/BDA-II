@@ -13,11 +13,11 @@ rule build_index:
     output:
         multiext(f"{REF_DIR}/genome.fa.bwameth.c2t",
             "",
-            ".0123",
             ".amb",
             ".ann",
-            ".bwt.2bit.64",
+            ".bwt",
             ".pac",
+            ".sa",
         )
     threads: 1
     log:
@@ -26,7 +26,7 @@ rule build_index:
         "../envs/map_data.yml"
     shell:
         """
-        bwameth.py index-mem2 {input} > {log} 2>&1
+        bwameth.py index {input} > {log} 2>&1
         """
 
 rule map_data:
@@ -36,11 +36,9 @@ rule map_data:
         index = rules.build_index.output,
         ref_genome = f"{REF_DIR}/genome.fa"
     output:
-        multiext(f"{MAPPED_DIR}/{{acc}}.sorted",
-            bam=".bam",
-            bai=".bai"
-        )
-    threads: max(1, config['max_threads'] // 2)
+        bam = f"{MAPPED_DIR}/{{acc}}.sorted.bam",
+        bai = f"{MAPPED_DIR}/{{acc}}.sorted.bam.bai"
+    threads: max(1, config['max_threads'])
     conda:
         "../envs/map_data.yml"
     log:
