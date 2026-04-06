@@ -10,8 +10,8 @@ REF_GEN_CONF = config["ref"]['genome']
 
 rule get_data:
     output:
-        fastq_1 = f"{RAW_DIR}/{{acc}}_1.{FASTQ_SUFFIX}.{GZIPPED_SUFFIX}",
-        fastq_2 = f"{RAW_DIR}/{{acc}}_2.{FASTQ_SUFFIX}.{GZIPPED_SUFFIX}"
+        fastq_1 = temp(f"{RAW_DIR}/{{acc}}_1.{FASTQ_SUFFIX}.{GZIPPED_SUFFIX}"),
+        fastq_2 = temp(f"{RAW_DIR}/{{acc}}_2.{FASTQ_SUFFIX}.{GZIPPED_SUFFIX}")
     threads: 1
     params:
         outdir=RAW_DIR,
@@ -20,6 +20,9 @@ rule get_data:
         "logs/fasterq_dump/{acc}.log"
     conda:
         f"../envs/data_download.yml"
+    resources:
+        download_job=1,
+        memory_slot=1
     shell:
         r"""
         echo "Downloading files for: {wildcards.acc}" >&2
@@ -27,7 +30,6 @@ rule get_data:
         fastq-dump {wildcards.acc} \
             -O {params.outdir} \
             --split-files \
-            -X 500000 \
             --gzip \
             > {log} 2>&1
         """
@@ -35,7 +37,7 @@ rule get_data:
 
 rule get_genome:
     output:
-        genome = f"{REF_DIR}/genome.fa.gz"
+        genome = temp(f"{REF_DIR}/genome.fa.gz")
     params:
         link=REF_GEN_CONF['link']
     threads: 1

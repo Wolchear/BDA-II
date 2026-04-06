@@ -38,7 +38,9 @@ rule map_data:
     output:
         bam = f"{MAPPED_DIR}/{{acc}}.sorted.bam",
         bai = f"{MAPPED_DIR}/{{acc}}.sorted.bam.bai"
-    threads: max(1, config['max_threads'])
+    threads: max(1, config['max_threads'] // 2)
+    resources:
+        mapping_slot=1
     conda:
         "../envs/map_data.yml"
     log:

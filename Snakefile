@@ -17,13 +17,6 @@ SRA = samples.index.tolist()
 rule all:
     input:
         expand(
-            "{data_dir}/{acc}_{paired}.{suffix}",
-            data_dir=get_path(DATA, "raw"),
-            acc=SRA,
-            paired=[1, 2],
-            suffix=f'{SUFFIX["fastq"]}.{SUFFIX["compressed"]}'
-        ),
-        expand(
             "{report_dir}/multiqc.html",
             report_dir=[get_path(QC,'raw'), get_path(QC,'trimmed')]
         ),
