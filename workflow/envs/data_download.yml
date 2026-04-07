@@ -5,3 +5,4 @@ channels:
 dependencies:
   - sra-tools=3.2.1
   - pigz=2.8
+  - pandas>=3.0.1

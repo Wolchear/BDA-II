@@ -1,4 +1,5 @@
 from workflow.lib.utils import get_path
+import pandas as pd
 
 RAW_DIR = get_path(config["data"], 'raw')
 REF_DIR = get_path(config["data"], 'references')
@@ -8,6 +9,9 @@ GZIPPED_SUFFIX = config['suffix']['compressed']
 
 REF_GEN_CONF = config["ref"]['genome']
 
+SAMPLES = pd.read_csv("config/samples.tsv", sep="\t").set_index("SRA")
+
+
 rule get_data:
     output:
         fastq_1 = temp(f"{RAW_DIR}/{{acc}}_1.{FASTQ_SUFFIX}.{GZIPPED_SUFFIX}"),
@@ -15,7 +19,9 @@ rule get_data:
     threads: 1
     params:
         outdir=RAW_DIR,
-        fastq_suffix=FASTQ_SUFFIX
+        fastq_suffix=FASTQ_SUFFIX,
+        url_1=lambda wc: SAMPLES.loc[wc.acc, "fastq_1"],
+        url_2=lambda wc: SAMPLES.loc[wc.acc, "fastq_2"]
     log:
         "logs/fasterq_dump/{acc}.log"
     conda:
@@ -27,11 +33,13 @@ rule get_data:
         r"""
         echo "Downloading files for: {wildcards.acc}" >&2
 
-        fastq-dump {wildcards.acc} \
-            -O {params.outdir} \
-            --split-files \
-            --gzip \
-            > {log} 2>&1
+        wget -O {output.fastq_1} "{params.url_1}" > {log} 2>&1 &
+        pid1=$!
+
+        wget -O {output.fastq_2} "{params.url_2}" >> {log} 2>&1 &
+        pid2=$!
+
+        wait $pid1 $pid2
         """
 
 

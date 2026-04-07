@@ -1,5 +1,5 @@
-SRA	GEO	condition
-SRR11647652	GSM4505860	normal
-SRR11647654	GSM4505862	normal
-SRR11647662	GSM4505870	cancer
-SRR11647664	GSM4505872	cancer
+SRA	GEO	condition	fastq_1	fastq_2	library_layout
+SRR11647652	GSM4505860	normal	https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR116/052/SRR11647652/SRR11647652_1.fastq.gz	https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR116/052/SRR11647652/SRR11647652_2.fastq.gz	PE
+SRR11647654	GSM4505862	normal	https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR116/054/SRR11647654/SRR11647654_1.fastq.gz	https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR116/054/SRR11647654/SRR11647654_2.fastq.gz	PE
+SRR11647662	GSM4505870	cancer	https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR116/062/SRR11647662/SRR11647662_1.fastq.gz	https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR116/062/SRR11647662/SRR11647662_2.fastq.gz	PE
+SRR11647664	GSM4505872	cancer	https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR116/064/SRR11647664/SRR11647664_1.fastq.gz	https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR116/064/SRR11647664/SRR11647664_2.fastq.gz	PE
