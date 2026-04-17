@@ -21,7 +21,7 @@ rule all:
             report_dir=[get_path(QC,'raw'), get_path(QC,'trimmed')]
         ),
         expand(
-            "{mapped_dir}/{acc}.sorted.bam",
+            "{mapped_dir}/{acc}.sorted.names.bam",
             mapped_dir=get_path(OUTPUT, "mapped"),
             acc=SRA
         )

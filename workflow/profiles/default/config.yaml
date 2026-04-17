@@ -1,4 +1,5 @@
 use-conda: true
+conda-frontend: mamba
 cores: 6
 rerun-incomplete: true
 
@@ -6,5 +7,6 @@ resources:
   - mapping_slot=1
   - download_job=1
   - trim_job=1
-  - memory_slot=2
+  - memory_slot=1
   - multiqc_slot=1
+

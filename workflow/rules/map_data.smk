@@ -11,22 +11,25 @@ rule build_index:
     input:
         f"{REF_DIR}/genome.fa"
     output:
-        multiext(f"{REF_DIR}/genome.fa.bwameth.c2t",
-            "",
-            ".amb",
-            ".ann",
-            ".bwt",
-            ".pac",
-            ".sa",
+        multiext(f"{REF_DIR}/genome.fa.index.bs",
+            ".index",
+            ".index.bwt",
+            ".index.occ",
+            ".index.sa",
+            ".pac"
+        ),
+        multiext(f"{REF_DIR}/genome.fa",
+            ".index",
+            ".index.methy",
         )
     threads: 1
     log:
-        "logs/bwameth/index.log"
+        "logs/bitmapper/index.log"
     conda:
         "../envs/map_data.yml"
     shell:
         """
-        bwameth.py index {input} > {log} 2>&1
+        bitmapperBS --index {input} > {log} 2>&1
         """
 
 rule map_data:
@@ -36,25 +39,23 @@ rule map_data:
         index = rules.build_index.output,
         ref_genome = f"{REF_DIR}/genome.fa"
     output:
-        bam = f"{MAPPED_DIR}/{{acc}}.sorted.bam",
-        bai = f"{MAPPED_DIR}/{{acc}}.sorted.bam.bai"
-    threads: max(1, config['max_threads'] // 2)
+        bam = temp(f"{MAPPED_DIR}/{{acc}}.unsorted.bam")
+    threads: max(1, config['max_threads'])
     resources:
-        mapping_slot=1
+        mapping_slot=1,
+        memory_slot=1
     conda:
         "../envs/map_data.yml"
     log:
-        f"logs/bwameth/{{acc}}.log"
+        f"logs/bitmapper/{{acc}}.log"
     shell:
         r"""
-        set -euo pipefail
-
-        bwameth.py --reference {input.ref_genome} \
-                   {input.fasta_1} \
-                   {input.fasta_2} \
-                   -t {threads} \
-                   2> {log} \
-                   | samtools sort -@ {threads} -o {output.bam} 2>> {log}
-
-        samtools index {output.bam} 2>> {log}
+        bitmapperBS --search {input.ref_genome} \
+            --seq1 {input.fasta_1} \
+            --seq2 {input.fasta_2} \
+            --bam -o {output.bam} \
+            --sensitive \
+            -t {threads} > {log} 2>&1
         """
+
+

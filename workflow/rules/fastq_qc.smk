@@ -29,14 +29,12 @@ rule trim:
     input:
         r1=f"{RAW_DIR}/{{acc}}_1.{DATA_SUFFIX}",
         r2=f"{RAW_DIR}/{{acc}}_2.{DATA_SUFFIX}",
-        fastq1 = f"{RAW_REPORTS_DIR}/{{acc}}_1_fastqc.html",   # DAG hardlock
-        fastq2 = f"{RAW_REPORTS_DIR}/{{acc}}_2_fastqc.html"
     output:
         r1=temp(f"{TRIMMED_DIR}/{{acc}}_1.{DATA_SUFFIX}"),
         r2=temp(f"{TRIMMED_DIR}/{{acc}}_2.{DATA_SUFFIX}")
     threads: max(1, config['max_threads'] // 2)
     log:
-        "logs/trim_galore/{acc}.log"
+        "logs/fastp/{acc}.log"
     conda:
         f"../envs/fastq_qc.yml"
     params:
@@ -45,17 +43,15 @@ rule trim:
         trim_job=1,
         memory_slot=1
     shell:
-       r"""
-        trim_galore \
-            --paired \
-            --gzip \
-            -o {params.outdir} \
-            --cores {threads} \
-            {input.r1} {input.r2} \
+        r"""
+        fastp \
+            -i {input.r1} \
+            -I {input.r2} \
+            -o {output.r1} \
+            -O {output.r2} \
+            -w {threads} \
+            --detect_adapter_for_pe \
             > {log} 2>&1
-        
-        mv {params.outdir}/{wildcards.acc}_1_val_1.fq.gz {output.r1}
-        mv {params.outdir}/{wildcards.acc}_2_val_2.fq.gz {output.r2}
         """
 
 rule fastqc:
@@ -70,7 +66,7 @@ rule fastqc:
         outdir=lambda wc: wc.out_dir
     wildcard_constraints:
         out_dir=f"{RAW_REPORTS_DIR}|{TRIMMED_REPORTS_DIR}"
-    threads: max(1, config["max_threads"] // 3)
+    threads: 1
     conda:
         "../envs/fastq_qc.yml"
     shell:

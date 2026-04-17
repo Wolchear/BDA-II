@@ -23,7 +23,7 @@ rule get_data:
         url_1=lambda wc: SAMPLES.loc[wc.acc, "fastq_1"],
         url_2=lambda wc: SAMPLES.loc[wc.acc, "fastq_2"]
     log:
-        "logs/fasterq_dump/{acc}.log"
+        "logs/data_download/{acc}.log"
     conda:
         f"../envs/data_download.yml"
     resources:
@@ -33,10 +33,10 @@ rule get_data:
         r"""
         echo "Downloading files for: {wildcards.acc}" >&2
 
-        wget -O {output.fastq_1} "{params.url_1}" > {log} 2>&1 &
+        curl -L {params.url_1} -o {output.fastq_1} > {log} 2>&1 &
         pid1=$!
 
-        wget -O {output.fastq_2} "{params.url_2}" >> {log} 2>&1 &
+        curl -L {params.url_2} -o {output.fastq_2} >> {log} 2>&1 &
         pid2=$!
 
         wait $pid1 $pid2

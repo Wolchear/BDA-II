@@ -5,6 +5,8 @@ logs/*
 *.zip
 multiqc_data/
 output/mapped/
+*.html
+*.json 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

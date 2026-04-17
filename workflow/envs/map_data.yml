@@ -3,5 +3,4 @@ channels:
   - bioconda
 
 dependencies:
-  - bwameth=0.2.9
-  - samtools=1.23.1
+  - bitmapperbs=1.0.2.3=hc088bd4_2
