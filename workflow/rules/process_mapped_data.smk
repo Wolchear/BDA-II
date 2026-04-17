@@ -73,7 +73,7 @@ rule index:
         f"{MAPPED_DIR}/{{acc}}.sorted.bam.bai"
     threads: 1
     conda:
-            "../envs/process_mapped_data.yml"
+        "../envs/process_mapped_data.yml"
     log:
         f"logs/bam_index/{{acc}}.log"
     shell:

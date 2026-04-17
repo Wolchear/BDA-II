@@ -6,6 +6,7 @@ data:
     raw: "raw"
     references: "references"
     trimmed: 'trimmed'
+    meth_call: 'methylation_calling'
 
 workflow:
   base_root: "workflow"
@@ -26,6 +27,7 @@ qc:
     mapping: 'mapping'
     raw: 'raw'
     trimmed: 'trimmed'
+    mbias: 'mbias'
 
 suffix:
   fasta: 'fasta'
