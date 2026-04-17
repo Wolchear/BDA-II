@@ -27,7 +27,7 @@ rule deduplicate:
     input:
         name_sorted_bam = rules.sort_name.output.bam
     output:
-        deduplicated_bam = temp(f"{MAPPED_DIR}/{{acc}}.sorted.names.bam")
+        deduplicated_bam = temp(f"{MAPPED_DIR}/{{acc}}.deduplicated.bam")
     threads: 1
     resources:
         memory_slot=1
@@ -48,9 +48,9 @@ rule deduplicate:
 
 rule sort_by_cords:
     input:
-        deduplicated_bam = rules.deduplicate.output.bam
+        deduplicated_bam = rules.deduplicate.output.deduplicated_bam
     output:
-        bam = temp(f"{MAPPED_DIR}/{{acc}}.sorted.names.bam")
+        bam = temp(f"{MAPPED_DIR}/{{acc}}.sorted.bam")
     threads: max(1, config['max_threads'])
     resources:
         memory_slot=1
@@ -63,7 +63,7 @@ rule sort_by_cords:
         samtools sort -n -@ {threads} \
             -m 1536M \
             -o {output.bam} \
-            {input.unsorted_bam} > {log} 2>&1
+            {input.deduplicated_bam} > {log} 2>&1
         """
 
 rule index:

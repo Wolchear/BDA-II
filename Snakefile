@@ -21,7 +21,7 @@ rule all:
             report_dir=[get_path(QC,'raw'), get_path(QC,'trimmed')]
         ),
         expand(
-            "{mapped_dir}/{acc}.sorted.names.bam",
+            "{mapped_dir}/{acc}.sorted.bam.bai",
             mapped_dir=get_path(OUTPUT, "mapped"),
             acc=SRA
         )
@@ -42,3 +42,8 @@ module map_data:
     snakefile: f"{RULES_DIR}/map_data.smk"
     config: config
 use rule * from map_data
+
+module process_mapped_data:
+    snakefile: f"{RULES_DIR}/process_mapped_data.smk"
+    config: config
+use rule * from process_mapped_data
