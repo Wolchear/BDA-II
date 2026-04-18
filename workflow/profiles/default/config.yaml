@@ -1,5 +1,4 @@
 use-conda: true
-conda-frontend: mamba
 cores: 6
 rerun-incomplete: true
 

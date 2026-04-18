@@ -6,7 +6,6 @@ data:
     raw: "raw"
     references: "references"
     trimmed: 'trimmed'
-    meth_call: 'methylation_calling'
 
 workflow:
   base_root: "workflow"
@@ -20,6 +19,7 @@ output:
   base_root: "output"
   dirs:
     mapped: 'mapped'
+    meth_call: 'methylation_calling'
 
 qc:
   base_root: "QC"

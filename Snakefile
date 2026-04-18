@@ -21,8 +21,8 @@ rule all:
             report_dir=[get_path(QC,'raw'), get_path(QC,'trimmed')]
         ),
         expand(
-            "{mapped_dir}/{acc}.sorted.bam.bai",
-            mapped_dir=get_path(OUTPUT, "mapped"),
+            "{meth_dir}/{acc}_CpG.bedGraph",
+            meth_dir=get_path(config['output'], 'meth_call'),
             acc=SRA
         )
 
@@ -47,3 +47,8 @@ module process_mapped_data:
     snakefile: f"{RULES_DIR}/process_mapped_data.smk"
     config: config
 use rule * from process_mapped_data
+
+module methylation_call:
+    snakefile: f"{RULES_DIR}/methylation_call.smk"
+    config: config
+use rule * from methylation_call
