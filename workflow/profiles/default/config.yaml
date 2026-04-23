@@ -8,4 +8,5 @@ resources:
   - trim_job=1
   - memory_slot=1
   - multiqc_slot=1
+  - mem_mb=12000
 

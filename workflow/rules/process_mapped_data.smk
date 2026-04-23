@@ -3,11 +3,11 @@ from workflow.lib.utils import get_path
 REF_DIR = get_path(config["data"], 'references')
 MAPPED_DIR =  get_path(config["output"], "mapped")
 
-rule sort_name:
+rule sort:
     input:
         unsorted_bam = f"{MAPPED_DIR}/{{acc}}.unsorted.bam"
     output:
-        bam = temp(f"{MAPPED_DIR}/{{acc}}.sorted.names.bam")
+        cord_sorted_bam = temp(f"{MAPPED_DIR}/{{acc}}.sorted.bam")
     threads: max(1, config['max_threads'])
     resources:
         memory_slot=1
@@ -15,63 +15,57 @@ rule sort_name:
         "../envs/process_mapped_data.yml"
     log:
         f"logs/sort/{{acc}}.log"
+    params:
+        acc = lambda wc: wc.acc
     shell:
         r"""
-        samtools sort -n -@ {threads} \
-            -m 1536M \
-            -o {output.bam} \
-            {input.unsorted_bam} > {log} 2>&1
+        (
+            samtools addreplacerg \
+                -r ID:{params.acc} \
+                -r SM:{params.acc} \
+                -r PL:ILLUMINA \
+                -o - \
+                {input.unsorted_bam} \
+            | samtools sort -@ {threads} \
+                -m 1536M \
+                -o {output.cord_sorted_bam} \
+                -
+        ) > {log} 2>&1
         """
 
 rule deduplicate:
     input:
-        name_sorted_bam = rules.sort_name.output.bam,
+        cord_sorted_bam = rules.sort.output.cord_sorted_bam,
         ref_genome = f"{REF_DIR}/genome.fa"
     output:
-        deduplicated_bam = temp(f"{MAPPED_DIR}/{{acc}}.deduplicated.bam")
+        deduplicated_bam = temp(f"{MAPPED_DIR}/{{acc}}.sorted.deduplicated.bam")
     threads: 1
     resources:
-        memory_slot=1
+        memory_slot=1,
+        mem_mb=12000
     conda:
         "../envs/process_mapped_data.yml"
     log:
         f"logs/deduplication/{{acc}}.log"
     params:
-        repot_file = lambda wc: f"{MAPPED_DIR}/dupsifter/{wc.acc}.txt"
+        repot_file = lambda wc: f"{MAPPED_DIR}/{wc.acc}_deduplication.txt",
+        java_heap_mb=lambda wc, resources: int(resources.mem_mb * 0.85)
     shell:
         r"""
-        dupsifter -r \
-            -o {output.deduplicated_bam} \
-            -O {params.repot_file} \
-            {input.ref_genome} \
-            {input.name_sorted_bam} > {log} 2>&1
-        """
+        export JAVA_TOOL_OPTIONS="-Xmx{params.java_heap_mb}m"
 
-rule sort_by_cords:
-    input:
-        deduplicated_bam = rules.deduplicate.output.deduplicated_bam
-    output:
-        bam = temp(f"{MAPPED_DIR}/{{acc}}.sorted.bam")
-    threads: max(1, config['max_threads'])
-    resources:
-        memory_slot=1
-    conda:
-        "../envs/process_mapped_data.yml"
-    log:
-        f"logs/sort/{{acc}}.log"
-    shell:
-        r"""
-        samtools sort -n -@ {threads} \
-            -m 1536M \
-            -o {output.bam} \
-            {input.deduplicated_bam} > {log} 2>&1
+        picard MarkDuplicates \
+            I={input.cord_sorted_bam} \
+            O={output.deduplicated_bam} \
+            M={params.repot_file} \
+            > {log} 2>&1
         """
 
 rule index:
     input:
-        sorted_bam = rules.sort_by_cords.output.bam
+        deduplicated_bam = rules.deduplicate.output.deduplicated_bam
     output:
-        temp(f"{MAPPED_DIR}/{{acc}}.sorted.bam.bai")
+        temp(f"{MAPPED_DIR}/{{acc}}.sorted.deduplicated.bam.bai")
     threads: 1
     conda:
         "../envs/process_mapped_data.yml"
@@ -79,5 +73,5 @@ rule index:
         f"logs/bam_index/{{acc}}.log"
     shell:
         r"""
-        samtools index {input.sorted_bam} > {log} 2>&1
+        samtools index {input.deduplicated_bam} > {log} 2>&1
         """
