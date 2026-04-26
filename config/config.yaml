@@ -28,6 +28,7 @@ qc:
     raw: 'raw'
     trimmed: 'trimmed'
     mbias: 'mbias'
+    bam_stat: 'flagstat'
 
 suffix:
   fasta: 'fasta'

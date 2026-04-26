@@ -4,9 +4,9 @@ rerun-incomplete: true
 
 resources:
   - mapping_slot=1
-  - download_job=1
-  - trim_job=1
-  - memory_slot=1
+  - download_job=2
+  - trim_job=2
+  - memory_slot=3
   - multiqc_slot=1
   - mem_mb=12000
 

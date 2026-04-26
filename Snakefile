@@ -24,6 +24,11 @@ rule all:
             "{meth_dir}/{acc}_CpG.bedGraph",
             meth_dir=get_path(config['output'], 'meth_call'),
             acc=SRA
+        ),
+        expand(
+            "{stat_dir}/{acc}.tsv",
+            stat_dir = get_path(QC, 'bam_stat'),
+            acc=SRA
         )
 
 RULES_DIR = get_path(config['workflow'], "rules")
