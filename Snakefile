@@ -27,7 +27,10 @@ rule all:
             meth_dir=get_path(config['output'], 'meth_call'),
             acc=SRA
         ),
-        f"{MAP_QC}/mapping_rates.png"
+        expand(
+            f"{MAP_QC}/{{plot}}.png",
+            plot=QC['plots']
+        )
 
 RULES_DIR = get_path(config['workflow'], "rules")
 
@@ -55,7 +58,6 @@ module methylation_call:
     snakefile: f"{RULES_DIR}/methylation_call.smk"
     config: config
 use rule * from methylation_call
-
 
 module mapping_qc:
     snakefile: f"{RULES_DIR}/mapping_qc.smk"

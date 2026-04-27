@@ -29,6 +29,9 @@ qc:
     trimmed: 'trimmed'
     mbias: 'mbias'
     bam_stat: 'flagstat'
+  plots:
+    - duplicates_rates
+    - mapping_rates
 
 suffix:
   fasta: 'fasta'
