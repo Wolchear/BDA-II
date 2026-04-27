@@ -35,7 +35,10 @@ suffix:
   fastq: 'fastq'
   compressed: 'gz'
 
-
+scripts:
+  qc:
+    base_root: 'QC'
+    fetch_read_counts: 'fetch_reads_count.py'
 
 ref:
   genome: 

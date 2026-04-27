@@ -24,7 +24,6 @@ DIR_LOG = {
     TRIMMED_REPORTS_DIR: 'trimmed'
 }
 
-
 rule trim:
     input:
         r1=f"{RAW_DIR}/{{acc}}_1.{DATA_SUFFIX}",

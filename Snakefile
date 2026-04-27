@@ -14,6 +14,8 @@ QC = config['qc']
 samples = pd.read_table("config/samples.tsv").set_index('SRA')
 SRA = samples.index.tolist()
 
+MAP_QC = get_path(config['qc'], "mapping")
+
 rule all:
     input:
         expand(
@@ -25,11 +27,7 @@ rule all:
             meth_dir=get_path(config['output'], 'meth_call'),
             acc=SRA
         ),
-        expand(
-            "{stat_dir}/{acc}.tsv",
-            stat_dir = get_path(QC, 'bam_stat'),
-            acc=SRA
-        )
+        f"{MAP_QC}/mapping_rates.png"
 
 RULES_DIR = get_path(config['workflow'], "rules")
 
@@ -57,3 +55,9 @@ module methylation_call:
     snakefile: f"{RULES_DIR}/methylation_call.smk"
     config: config
 use rule * from methylation_call
+
+
+module mapping_qc:
+    snakefile: f"{RULES_DIR}/mapping_qc.smk"
+    config: config
+use rule * from mapping_qc
