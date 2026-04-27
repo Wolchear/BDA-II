@@ -40,23 +40,25 @@ def read_flagstat(file_name: str) -> dict[str, int]:
     return content
 
 def plot_barplot(samples: list[str],
-                 duplicates: list[float],
-                 out_file: str
-    ) -> None:
-    x = range(len(samples))
+                 totals: list[int],
+                 out_file: str) -> None:
 
-    plt.bar(x, duplicates)
+    x = range(len(samples))
+    totals_m = [t / 1e6 for t in totals]
+
+    plt.figure(figsize=(8, 5))
+
+    plt.bar(x, totals_m)
 
     for i in range(len(samples)):
-        plt.text(i, duplicates[i] / 2,
-                f"{duplicates[i]:.1f}%",
-                ha='center', va='center', color='white', fontsize=8)
-    
-    plt.xticks(x, samples, rotation=45)
-    plt.ylabel("Percentage (%)")
-    plt.title("Duplicates statistics per sample")
+        plt.text(i, totals_m[i],
+                 f"{totals_m[i]:.1f}M",
+                 ha='center', va='bottom', fontsize=8)
 
-    plt.legend()
+    plt.xticks(x, samples, rotation=45, ha="right")
+    plt.ylabel("Reads (millions)")
+    plt.title("Total mapped reads per sample")
+
     plt.tight_layout()
     plt.savefig(out_file, dpi=300)
 
@@ -71,17 +73,16 @@ def main() -> None:
     
     
     samples: list[str] = []
-    duplicates: list[float] = []
+    totals: list[int] = []
 
     for sample, stat in stats.items():
         total = int(stat["total (QC-passed reads + QC-failed reads)"])
-        duplicate = int(stat["duplicates"])
 
         samples.append(sample)
 
-        duplicates.append(duplicate / total * 100)
+        totals.append(total)
     
-    plot_barplot(samples, duplicates, args.output)
+    plot_barplot(samples, totals, args.output)
         
 if __name__ == '__main__':
     main()
