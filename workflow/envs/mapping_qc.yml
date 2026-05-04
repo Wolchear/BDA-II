@@ -4,3 +4,4 @@ channels:
 
 dependencies:
   - matplotlib=3.10.9
+  - bedtools=2.31.1

@@ -20,6 +20,7 @@ output:
   dirs:
     mapped: 'mapped'
     meth_call: 'methylation_calling'
+    meth_matrix: 'meth_matrix'
 
 qc:
   base_root: "QC"
@@ -29,6 +30,7 @@ qc:
     trimmed: 'trimmed'
     mbias: 'mbias'
     bam_stat: 'flagstat'
+    cpg_cov: 'cpg_coverage'
   plots:
     - duplicates_rates
     - mapping_rates
