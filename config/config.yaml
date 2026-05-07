@@ -33,6 +33,7 @@ qc:
     cpg_cov: 'cpg_coverage'
     pca: 'PCA'
     cor: "correlation"
+    cov_per_sample: "coverage_per_sample"
   plots:
     - duplicates_rates
     - mapping_rates

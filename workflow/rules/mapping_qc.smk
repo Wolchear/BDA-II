@@ -15,6 +15,8 @@ MAP_QC = get_path(config['qc'], "mapping")
 CPG_COV = get_path(config['qc'], "cpg_cov")
 PCA_DIR = get_path(config['qc'], "pca")
 COR_DIR = get_path(config['qc'], "cor")
+COV_PER_SAMPLE = get_path(config['qc'], "cov_per_sample")
+
 
 SCRIPS = get_path(config['workflow'], 'scripts')
 
@@ -72,6 +74,21 @@ rule plot_cpg_cov:
     shell:
         """
         python3 {params.script} -i {input} -o {output.plot} --tsv {output.tsv} --max-cov 50
+        """
+
+rule write_cpg_cov:
+    input:
+        f"{CPG_COV}/{{acc}}_cov.tsv"
+    output:
+        report = f"{COV_PER_SAMPLE}/{{acc}}_cov.tsv",
+    threads: 1
+    conda:
+        f"../envs/mapping_qc.yml"
+    params:
+        script = f"{SCRIPS}/QC/count_cov_quantity.py"
+    shell:
+        """
+        python3 {params.script} -i {input} -o {output.report}
         """
 
 rule get_cov_matrix:

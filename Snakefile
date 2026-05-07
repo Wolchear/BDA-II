@@ -49,6 +49,11 @@ rule all:
             "{plots_dir}/cor_{threshold}.png",
             threshold=[1, 5, 15, 20],
             plots_dir = COR_DIR
+        ),
+        expand(
+             "{_dir}/{acc}_cov.tsv",
+             _dir = get_path(config['qc'], "cov_per_sample"),
+             acc=SRA
         )
 
 RULES_DIR = get_path(config['workflow'], "rules")
