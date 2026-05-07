@@ -31,6 +31,8 @@ qc:
     mbias: 'mbias'
     bam_stat: 'flagstat'
     cpg_cov: 'cpg_coverage'
+    pca: 'PCA'
+    cor: "correlation"
   plots:
     - duplicates_rates
     - mapping_rates

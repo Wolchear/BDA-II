@@ -16,6 +16,9 @@ SRA = samples.index.tolist()
 
 MAP_QC = get_path(config['qc'], "mapping")
 MATRIX_DIR = get_path(config['output'], 'meth_matrix')
+PCA_DIR = get_path(config['qc'], "pca")
+COR_DIR = get_path(config['qc'], "cor")
+
 
 rule all:
     input:
@@ -37,8 +40,16 @@ rule all:
             acc=SRA,
             plots_dir=get_path(config['qc'], "cpg_cov")
         ),
-        f"{MATRIX_DIR}/meth_matrix.bed",
-        f"{MATRIX_DIR}/cov_matrix.bed"
+        expand(
+            "{plots_dir}/pca_{threshold}.png",
+            threshold=[1, 5, 15, 20],
+            plots_dir = PCA_DIR
+        ),
+        expand(
+            "{plots_dir}/cor_{threshold}.png",
+            threshold=[1, 5, 15, 20],
+            plots_dir = COR_DIR
+        )
 
 RULES_DIR = get_path(config['workflow'], "rules")
 

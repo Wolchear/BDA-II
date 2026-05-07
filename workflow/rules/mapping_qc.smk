@@ -13,6 +13,8 @@ MATRIX_DIR = get_path(config['output'], 'meth_matrix')
 
 MAP_QC = get_path(config['qc'], "mapping")
 CPG_COV = get_path(config['qc'], "cpg_cov")
+PCA_DIR = get_path(config['qc'], "pca")
+COR_DIR = get_path(config['qc'], "cor")
 
 SCRIPS = get_path(config['workflow'], 'scripts')
 
@@ -137,3 +139,77 @@ rule merge_matrix:
             -i {input} \
             > {output} 2> {log}
         """
+
+rule get_masks:
+    input:
+         f"{MATRIX_DIR}/cov_matrix.bed"
+    output:
+        expand(
+            "{_dir}/masks/cov_mask_{coverage}.packed.npy",
+            {_dir} = MATRIX_DIR,
+            coverage = [1, 5, 15, 20]
+        )
+    threads: 1
+    conda:
+        "../envs/mapping_qc.yml"
+    params:
+        script = f"{SCRIPS}/QC/_gen_cov_masks.py",
+        outdir = f"{MATRIX_DIR}/masks"
+    shell:
+        """
+        python3 {params.script} -i {input} -p {params.outdir}
+        """
+
+rule plot_pca:
+    input:
+        meth = f"{MATRIX_DIR}/meth_matrix.bed",
+        masks = rules.get_masks.output
+    output:
+        expand(
+            "{plot_dir}/pca_{threshold}.png",
+            threshold=[1, 5, 15, 20],
+            plot_dir = PCA_DIR
+        )
+    threads: 1
+    conda:
+        "../envs/mapping_qc.yml"
+    log:
+        f"logs/pca/pca.log"
+    params:
+        script = f"{SCRIPS}/QC/plot_pca.py",
+        outdir = PCA_DIR
+    shell:
+        r"""
+        python3 {params.script} --meth-matrix {input.meth} \
+                --cov-matrix {input.cov} \
+                --outdir {params.outdir} \
+                2> {log}
+        """
+
+rule plot_cor:
+    input:
+        meth = f"{MATRIX_DIR}/meth_matrix.bed",
+        masks = rules.get_masks.output
+    output:
+        expand(
+            "{plot_dir}/cor_{threshold}.png",
+            threshold=[1, 5, 15, 20],
+            plot_dir = COR_DIR
+        )
+    threads: 1
+    conda:
+        "../envs/mapping_qc.yml"
+    log:
+        f"logs/cor/cor.log"
+    params:
+        script = f"{SCRIPS}/QC/plot_cor.py",
+        outdir = COR_DIR
+    shell:
+        r"""
+        python3 {params.script} --meth-matrix {input.meth} \
+                --mask-files {input.masks}
+                --outdir {params.outdir} \
+                --thresholds 1 5 15 20 \
+                2> {log}
+        """
+
