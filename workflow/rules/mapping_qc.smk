@@ -146,7 +146,7 @@ rule get_masks:
     output:
         expand(
             "{_dir}/masks/cov_mask_{coverage}.packed.npy",
-            {_dir} = MATRIX_DIR,
+            _dir= MATRIX_DIR,
             coverage = [1, 5, 15, 20]
         )
     threads: 1
@@ -171,6 +171,8 @@ rule plot_pca:
             plot_dir = PCA_DIR
         )
     threads: 1
+    resources:
+        big_matrix_procces_job = 1
     conda:
         "../envs/mapping_qc.yml"
     log:
@@ -181,8 +183,9 @@ rule plot_pca:
     shell:
         r"""
         python3 {params.script} --meth-matrix {input.meth} \
-                --cov-matrix {input.cov} \
+                --mask-files {input.masks} \
                 --outdir {params.outdir} \
+                --thresholds 1 5 15 20 \
                 2> {log}
         """
 
@@ -197,6 +200,8 @@ rule plot_cor:
             plot_dir = COR_DIR
         )
     threads: 1
+    resources:
+        big_matrix_procces_job = 1
     conda:
         "../envs/mapping_qc.yml"
     log:
@@ -207,7 +212,7 @@ rule plot_cor:
     shell:
         r"""
         python3 {params.script} --meth-matrix {input.meth} \
-                --mask-files {input.masks}
+                --mask-files {input.masks} \
                 --outdir {params.outdir} \
                 --thresholds 1 5 15 20 \
                 2> {log}

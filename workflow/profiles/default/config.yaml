@@ -9,4 +9,5 @@ resources:
   - memory_slot=3
   - multiqc_slot=1
   - mem_mb=12000
+  - big_matrix_procces_job=1
 
