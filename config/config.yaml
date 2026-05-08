@@ -21,6 +21,7 @@ output:
     mapped: 'mapped'
     meth_call: 'methylation_calling'
     meth_matrix: 'meth_matrix'
+    dmc: 'dmc_calling'
 
 qc:
   base_root: "QC"

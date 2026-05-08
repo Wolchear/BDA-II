@@ -54,7 +54,8 @@ rule all:
              "{_dir}/{acc}_cov.tsv",
              _dir = get_path(config['qc'], "cov_per_sample"),
              acc=SRA
-        )
+        ),
+        f"{get_path(config['output'], 'dmc')}/filterd_BS.rds"
 
 RULES_DIR = get_path(config['workflow'], "rules")
 
@@ -87,3 +88,8 @@ module mapping_qc:
     snakefile: f"{RULES_DIR}/mapping_qc.smk"
     config: config
 use rule * from mapping_qc
+
+module dmc_calling:
+    snakefile: f"{RULES_DIR}/dmc_calling.smk"
+    config: config
+use rule * from dmc_calling
