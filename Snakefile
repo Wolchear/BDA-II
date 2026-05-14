@@ -55,7 +55,7 @@ rule all:
              _dir = get_path(config['qc'], "cov_per_sample"),
              acc=SRA
         ),
-        f"{get_path(config['output'], 'dmc')}/filterd_BS.rds"
+        f"{get_path(config['output'], 'dmc')}/dml_test.rds"
 
 RULES_DIR = get_path(config['workflow'], "rules")
 

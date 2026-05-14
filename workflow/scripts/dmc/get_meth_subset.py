@@ -27,11 +27,11 @@ def read_bed_matrix( file_name: str, chromosomes: list[int]) -> None:
     chrom_set = {f"chr{chrom}" for chrom in chromosomes}
     with open(file_name, 'r') as fh:
         header = fh.readline()
-        print(header)
+        print(header, end='')
         for line in fh:
-            bloks = line.split("\t", 1)[0]
-            if bloks[0] in chrom_set:
-                print(line)
+            chrom = line.split("\t", 1)[0]
+            if chrom in chrom_set:
+                print(line, end='')
 
 def main():
     args = parse_args()

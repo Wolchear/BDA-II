@@ -7,3 +7,4 @@ dependencies:
   - r-base=4.5
   - r-data.table=1.17.8
   - bioconductor-bsseq=1.46.0
+  - bioconductor-dss=2.58.0

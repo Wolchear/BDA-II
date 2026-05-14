@@ -1,6 +1,7 @@
 suppressPackageStartupMessages(library(optparse))
 suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(bsseq))
+suppressPackageStartupMessages(library(DSS))
 
 
 option_list <- list(
@@ -8,7 +9,9 @@ option_list <- list(
   make_option(c("--cov"), type = "character", help = "Coverage matrix file"),
   make_option(c("--sample-info"), type = "character", help = "Samples metadata"),
   make_option(c("--output", "-o"), type = "character", help = "Output RDS file"),
-  make_option(c("--cov-filter"), type = "integer", default = 10, help = "Minimum coverage per cpg for filtering")
+  make_option(c("--cov-filter"), type = "integer", default = 10, help = "Minimum coverage per cpg for filtering"),
+  make_option(c("--threads", "-t"), type = "integer", default = 1, help = "Threads"),
+  make_option(c("--smoothing"), action = "store_true", default = TRUE, help = "Smoothing")
 )
 
 get_bs <- function(meth, cov, sample_info) {
@@ -51,6 +54,17 @@ filter_bs <- function(BS, cov_filter) {
     return(BS[keep_cpgs])
 }
 
+test_dml <- function(BS_filtered, group1, group2, cores, smoothing) {
+    return (
+        DMLtest(BS_filtered,
+            group1 = group1,
+            group2 = group2,
+            ncores = cores, 
+            smoothing = smoothing
+        )
+    )
+}
+
 opt <- parse_args(OptionParser(option_list = option_list))
 
 methylation_dt <- fread(opt$meth)
@@ -61,5 +75,16 @@ BS <- get_bs(methylation_dt, coverage_dt, sample_info)
 
 BS_filtered <- filter_bs(BS, opt[["cov-filter"]])
 
+group1 <- sample_info[condition == "normal", SRA]
+group2 <- sample_info[condition == "cancer", SRA]
+
+dmlTest <- test_dml(
+    BS_filtered,
+    group1,
+    group2,
+    opt$threads,
+    opt$smoothing
+)
+
 dir.create(dirname(opt$output), recursive = TRUE, showWarnings = FALSE)
-saveRDS(BS_filtered, opt$output)
+saveRDS(dmlTest, opt$output)

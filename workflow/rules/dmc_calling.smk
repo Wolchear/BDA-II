@@ -34,14 +34,14 @@ rule get_bs:
         cov = f"{MATRIX_DIR}/cov_subset_matrix.bed",
         sample_info = "config/samples.tsv"
     output:
-        f"{DMC_DIR}/filterd_BS.rds"
+        f"{DMC_DIR}/dml_test.rds"
     params:
-        script = f"{SCRIPS}/dmc/get_bs.r"
-    threads: 1
+        script = f"{SCRIPS}/dmc/test_dml.r"
+    threads: max(1, config['max_threads'] // 2)
     conda:
         "../envs/dmc_calling.yml"
     log:
-        f"logs/dmc/bs.log"
+        f"logs/dmc/test.log"
     shell:
         r"""
         Rscript {params.script} \
@@ -50,5 +50,6 @@ rule get_bs:
             --sample-info {input.sample_info} \
             --output {output} \
             --cov-filter 10 \
+            --threads {threads} \
             2> {log}
         """
