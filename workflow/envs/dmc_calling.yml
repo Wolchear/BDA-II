@@ -8,3 +8,5 @@ dependencies:
   - r-data.table=1.17.8
   - bioconductor-bsseq=1.46.0
   - bioconductor-dss=2.58.0
+  - r-gridextra=2.3
+  - r-venndiagram=1.6.16

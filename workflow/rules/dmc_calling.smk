@@ -2,6 +2,7 @@ from workflow.lib.utils import get_path
 
 MATRIX_DIR = get_path(config['output'], 'meth_matrix')
 DMC_DIR = get_path(config['output'], 'dmc')
+VENN_DIR = get_path(config['QC'], 'venn')
 
 SCRIPTS = get_path(config['workflow'], 'scripts')
 
@@ -19,6 +20,15 @@ DELTA_THRESHOLDS = {
     '02': 0.2
 }
 
+CALLING_SCRIPTS = {
+    'dss': 'call_dmc.r',
+    'wilcoxon': 'call_dmc_wilcoxon.r'
+}
+
+TESTING_SCRIPTS = {
+    'dss': 'test_dml.r',
+    'wilcoxon': 'test_wilcoxon.r'
+}
 
 rule get_subset:
     input:
@@ -74,14 +84,14 @@ rule test_dml:
         bs = rules.get_bs.output,
         sample_info = "config/samples.tsv"
     output:
-        f"{DMC_DIR}/dml_test.rds"
+        f"{DMC_DIR}/{{method}}/dml_test.rds"
     params:
-        script = f"{SCRIPTS}/dmc/test_dml.r"
+        script = lambda wc: f"{SCRIPTS}/dmc/{TESTING_SCRIPTS[wc.method]}"
     threads: max(1, config['max_threads'] // 2)
     conda:
         "../envs/dmc_calling.yml"
     log:
-        f"logs/dmc/test.log"
+        f"logs/dmc/{{method}}/test.log"
     shell:
         r"""
         Rscript {params.script} \
@@ -89,24 +99,24 @@ rule test_dml:
             --sample-info {input.sample_info} \
             --output {output} \
             --threads {threads} \
-            2> {log}
+            > {log} 2>&1
         """
 
-rule call_dss_dmc:
+rule call_dmc:
     input:
-        dml = f"{DMC_DIR}/dml_test.rds"
+        dml = f"{DMC_DIR}/{{method}}/dml_test.rds"
     output:
-        dmcs = f"{DMC_DIR}/dss/dmcs_p{{p}}_d{{delta}}.rds",
-        table = f"{DMC_DIR}/dss/dmcs_p{{p}}_d{{delta}}.tsv"
+        dmcs = f"{DMC_DIR}/{{method}}/dmcs_p{{p}}_d{{delta}}.rds",
+        table = f"{DMC_DIR}/{{method}}/dmcs_p{{p}}_d{{delta}}.tsv"
     threads: 1
     log:
-        f"logs/dmc/calling/dss/dmcs_p{{p}}_d{{delta}}.log"
+        f"logs/dmc/calling/{{method}}/dmcs_p{{p}}_d{{delta}}.log"
     conda:
         "../envs/dmc_calling.yml"        
     params:
         p_value = lambda wc: P_THRESHOLDS[wc.p],
         delta = lambda wc: DELTA_THRESHOLDS[wc.delta],
-        script = f"{SCRIPTS}/dmc/call_dmc.r"
+        script = lambda wc: f"{SCRIPTS}/dmc/{CALLING_SCRIPTS[wc.method]}",
     shell:
         r"""
         Rscript {params.script} \
@@ -117,3 +127,19 @@ rule call_dss_dmc:
             --summary {output.table} \
             > {log} 2>&1
         """
+
+
+rule plot_viena:
+    input:
+        dss = f"{DMC_DIR}/dss/dmcs_p{{p}}_d{{delta}}.rds",
+        wilcoxon = f"{DMC_DIR}/wilcoxon/dmcs_p{{p}}_d{{delta}}.rds"
+    output:
+        f"{VENN_DIR}/venn_p{{p}}_d{{delta}}.pdf"
+    threads: 1
+    log:
+        f"logs/dmc/venn/venn_p{{p}}_d{{delta}}.log"
+    conda:
+        "../envs/dmc_calling.yml"
+    params:
+        script = f"{SCRIPTS}/dmc/plot_venn.r"
+        

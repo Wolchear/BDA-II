@@ -57,11 +57,12 @@ COV_PER_SAMPLE = expand(
 )
 
 DMC_CALLING = expand(
-    "{dmc_dir}/dss/dmcs_p{p}_d{delta}.{file}",
+    "{dmc_dir}/{method}/dmcs_p{p}_d{delta}.{file}",
     dmc_dir = get_path(config['output'], 'dmc'),
     p = ['000001','00001','0001','001', '005'],
     delta = ['0', '01', '02'],
-    file = ['rds', 'tsv']
+    file = ['rds', 'tsv'],
+    method = ['dss', 'wilcoxon']
 )
 
 

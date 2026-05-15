@@ -35,6 +35,7 @@ qc:
     pca: 'PCA'
     cor: "correlation"
     cov_per_sample: "coverage_per_sample"
+    venn: 'venn'
   plots:
     - duplicates_rates
     - mapping_rates
