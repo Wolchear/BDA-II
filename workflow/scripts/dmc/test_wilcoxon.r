@@ -24,10 +24,14 @@ test_wlcoxon <- function(bs, meth_matrix, group1, group2) {
     pvals <- apply(meth_matrix, 1, function(row) {
                     x <- as.numeric(row[group1])
                     y <- as.numeric(row[group2])
+
+                    x <- x[!is.na(x)]
+                    y <- y[!is.na(y)]
+                    
                     wilcox.test(x, y, exact = FALSE)$p.value
             })
     
-
+    
     diff <- rowMeans(meth_matrix[, group2, drop = FALSE], na.rm = TRUE) -
             rowMeans(meth_matrix[, group1, drop = FALSE], na.rm = TRUE)
 

@@ -2,7 +2,7 @@ from workflow.lib.utils import get_path
 
 MATRIX_DIR = get_path(config['output'], 'meth_matrix')
 DMC_DIR = get_path(config['output'], 'dmc')
-VENN_DIR = get_path(config['QC'], 'venn')
+VENN_DIR = get_path(config['qc'], 'venn')
 
 SCRIPTS = get_path(config['workflow'], 'scripts')
 
@@ -142,4 +142,11 @@ rule plot_viena:
         "../envs/dmc_calling.yml"
     params:
         script = f"{SCRIPTS}/dmc/plot_venn.r"
-        
+    shell:
+        r"""
+        Rscript {params.script} \
+            --dss {input.dss} \
+            --wilcoxon {input.wilcoxon} \
+            --output {output} \
+            >{log} 2>&1
+        """
