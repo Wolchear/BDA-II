@@ -19,43 +19,61 @@ MATRIX_DIR = get_path(config['output'], 'meth_matrix')
 PCA_DIR = get_path(config['qc'], "pca")
 COR_DIR = get_path(config['qc'], "cor")
 
+RAW_MULTIQC = expand(
+    "{report_dir}/multiqc.html",
+    report_dir=[
+        get_path(QC, "raw"),
+        get_path(QC, "trimmed")
+    ]
+)
+
+MAP_QC_PLOTS = expand(
+    f"{MAP_QC}/{{plot}}.png",
+    plot=QC["plots"]
+)
+
+CPG_COV_PLOTS = expand(
+    "{plots_dir}/{acc}_cov.png",
+    acc=SRA,
+    plots_dir=get_path(config["qc"], "cpg_cov")
+)
+
+PCA_PLOTS = expand(
+    "{plots_dir}/pca_{threshold}.png",
+    threshold=[1, 5, 15, 20],
+    plots_dir=PCA_DIR
+)
+
+COR_PLOTS = expand(
+    "{plots_dir}/cor_{threshold}.png",
+    threshold=[1, 5, 15, 20],
+    plots_dir=COR_DIR
+)
+
+COV_PER_SAMPLE = expand(
+    "{_dir}/{acc}_cov.tsv",
+    _dir=get_path(config["qc"], "cov_per_sample"),
+    acc=SRA
+)
+
+DMC_CALLING = expand(
+    "{dmc_dir}/dss/dmcs_p{p}_d{delta}.{file}",
+    dmc_dir = get_path(config['output'], 'dmc'),
+    p = ['000001','00001','0001','001', '005'],
+    delta = ['0', '01', '02'],
+    file = ['rds', 'tsv']
+)
+
 
 rule all:
     input:
-        expand(
-            "{report_dir}/multiqc.html",
-            report_dir=[get_path(QC,'raw'), get_path(QC,'trimmed')]
-        ),
-        expand(
-            "{meth_dir}/{acc}_CpG.bedGraph",
-            meth_dir=get_path(config['output'], 'meth_call'),
-            acc=SRA
-        ),
-        expand(
-            f"{MAP_QC}/{{plot}}.png",
-            plot=QC['plots']
-        ),
-        expand(
-            "{plots_dir}/{acc}_cov.png",
-            acc=SRA,
-            plots_dir=get_path(config['qc'], "cpg_cov")
-        ),
-        expand(
-            "{plots_dir}/pca_{threshold}.png",
-            threshold=[1, 5, 15, 20],
-            plots_dir = PCA_DIR
-        ),
-        expand(
-            "{plots_dir}/cor_{threshold}.png",
-            threshold=[1, 5, 15, 20],
-            plots_dir = COR_DIR
-        ),
-        expand(
-             "{_dir}/{acc}_cov.tsv",
-             _dir = get_path(config['qc'], "cov_per_sample"),
-             acc=SRA
-        ),
-        f"{get_path(config['output'], 'dmc')}/dml_test.rds"
+        RAW_MULTIQC,
+        MAP_QC_PLOTS,
+        CPG_COV_PLOTS,
+        PCA_PLOTS,
+        COR_PLOTS,
+        COV_PER_SAMPLE,
+        DMC_CALLING
 
 RULES_DIR = get_path(config['workflow'], "rules")
 
